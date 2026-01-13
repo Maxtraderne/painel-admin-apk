@@ -20,6 +20,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # NOVO PASSO: Instala as dependências que estavam faltando e causando o erro
+      - name: Setup Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libgl1-mesa-dev mesa-utils cmake
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -31,14 +37,14 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Dependencies
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install flet
           # pip install -r requirements.txt
 
       - name: Build APK
-        # A MUDANÇA ESTÁ AQUI: Adicionei "yes |" para aceitar os prompts automaticamente
+        # Mantive o "yes |" para garantir, mas agora com as dependências instaladas não deve quebrar
         run: |
           yes | flet build apk --verbose
 
