@@ -2,38 +2,49 @@ name: Build APK
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main  # Verifique se o nome da sua branch principal é 'main' ou 'master'
+  workflow_dispatch: # Permite rodar manualmente o build
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-    - name: Install Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.19.x'
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # AQUI ESTÁ A CORREÇÃO: Usando a versão 3.24.0 que é compatível com o Flet novo
+          flutter-version: '3.24.0'
+          channel: 'stable'
 
-    - name: Install dependencies
-      run: |
-        pip install flet
-        pip install -r requirements.txt
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-    - name: Build APK
-      run: |
-        # O comando 'yes' responde 'y' para todas as perguntas automaticamente
-        yes | flet build apk --verbose
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flet
+          # Se tiver um requirements.txt, descomente a linha abaixo:
+          # pip install -r requirements.txt
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: painel-admin
-        path: build/apk/app-release.apk
+      - name: Build APK
+        run: |
+          flet build apk --verbose
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
