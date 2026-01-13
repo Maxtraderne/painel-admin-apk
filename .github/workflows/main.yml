@@ -3,8 +3,8 @@ name: Build APK
 on:
   push:
     branches:
-      - main  # Verifique se o nome da sua branch principal é 'main' ou 'master'
-  workflow_dispatch: # Permite rodar manualmente o build
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,7 +23,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          # AQUI ESTÁ A CORREÇÃO: Usando a versão 3.24.0 que é compatível com o Flet novo
           flutter-version: '3.24.0'
           channel: 'stable'
 
@@ -36,12 +35,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flet
-          # Se tiver um requirements.txt, descomente a linha abaixo:
           # pip install -r requirements.txt
 
       - name: Build APK
+        # A MUDANÇA ESTÁ AQUI: Adicionei "yes |" para aceitar os prompts automaticamente
         run: |
-          flet build apk --verbose
+          yes | flet build apk --verbose
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
